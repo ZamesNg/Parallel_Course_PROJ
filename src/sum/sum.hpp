@@ -10,9 +10,9 @@
 
 extern float rawFloatData[DATANUM];
 
-float Max(const float data[], const int len);
-float MaxSpeedUp(const float data[], const int len);
+float Max(const float data[],const int len); 
+float MaxSpeedUp(const float data[],const int len);
 
-void InitData(const float data[], const size_t len);
+void InitData(const float data[],const size_t len);
 
 #endif

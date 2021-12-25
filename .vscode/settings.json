@@ -11,6 +11,8 @@
     "type_traits": "cpp",
     "utility": "cpp",
     "iostream": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "random": "cpp",
+    "algorithm": "cpp"
   }
 }

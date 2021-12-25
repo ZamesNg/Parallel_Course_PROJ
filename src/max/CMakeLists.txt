@@ -2,6 +2,8 @@ project(MAX)
 
 # aux_source_directory(. max_src)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f -fabi-version=6 -DEIGEN_ENABLE_AVX512")
+
 FIND_PACKAGE( OpenMP REQUIRED)
 
 if(OPENMP_FOUND)

@@ -15,22 +15,21 @@ int main(int argc, char **argv)
   printf("init time consumption is %f s \r\n", (double)(finish_t - begin_t) / CLOCKS_PER_SEC);
 
   begin_t = clock();
-  max = Max(rawFloatData, DATANUM);
+  max = MaxSpeedUp(rawFloatData, DATANUM);
   finish_t = clock();
 
   printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM-1]);
+  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
   printf("max() time consumption is %f s \r\n", (double)(finish_t - begin_t) / CLOCKS_PER_SEC);
 
   initialCuda(0);
 
   begin_t = clock();
-  maxWithCuda(&max,rawFloatData,DATANUM);
+  maxWithCuda(&max, rawFloatData, DATANUM);
   finish_t = clock();
   printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM-1]);
+  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
   printf("MaxWithCuda() time consumption is %f s \r\n", (double)(finish_t - begin_t) / CLOCKS_PER_SEC);
-
 
   return 0;
 }

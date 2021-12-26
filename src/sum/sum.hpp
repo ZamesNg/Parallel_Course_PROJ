@@ -1,18 +1,19 @@
-#ifndef _MAX_HPP
-#define _MAX_HPP
+#ifndef _SUM_HPP
+#define _SUM_HPP
 
 #include <stdio.h>
 #include <math.h>
 
 #define MAX_THREADS 64
 #define SUBDATANUM 2000000
-#define DATANUM (SUBDATANUM * MAX_THREADS) /*这个数值是总数据量*/
+#define DATANUM (SUBDATANUM * MAX_THREADS)
 
 extern float rawFloatData[DATANUM];
 
-float Max(const float data[],const int len); 
-float MaxSpeedUp(const float data[],const int len);
+float Sum(const float data[],const size_t len); 
+float SumSpeedUpOmp(const float data[], const size_t len);
+float SumSpeedUpAvx(const float data[],const size_t len);
 
-void InitData(const float data[],const size_t len);
+void InitData();
 
 #endif

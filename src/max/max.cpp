@@ -4,21 +4,23 @@
 
 alignas(32) float rawFloatData[DATANUM];
 
-void InitData(const float data[], const size_t len)
+void InitData()
 {
   // #pragma omp parallel for
-  for (size_t i = 0; i < len; ++i)
+  for (size_t i = 0; i < DATANUM; ++i)
   {
     rawFloatData[i] = float(rand());
-    // rawFloatData[i] = float(i + 1);
+    // rawFloatData[i] = float(int(i))*1e0f;
   }
 }
 
 float Max(const float data[], const size_t len)
 {
-  float max_num_origin = 1e-30f;
   float max_num_read = 0.0f;
+
   float cur_num_read = 0.0f;
+  
+  float max_num_origin = 1e-30f;
 
   for (size_t i = 0; i < len; ++i)
   {
@@ -36,7 +38,7 @@ float MaxSpeedUp(const float data[], const size_t len)
   size_t num_iters = len / 8;
   int num_left = len - num_iters * 8;
 
-  printf("iters: %d \t left:%d \r\n", num_iters, num_left);
+  // printf("iters: %d \t left:%d \r\n", num_iters, num_left);
   __m256 *ptr = (__m256 *)data;
   alignas(32) __m256 max_num_origin = _mm256_set1_ps(1e-30f);
   alignas(32) __m256 max_num_read = _mm256_set1_ps(0.0f);

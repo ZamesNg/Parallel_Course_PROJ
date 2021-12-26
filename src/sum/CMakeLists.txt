@@ -2,6 +2,8 @@ project(SUM)
 
 # aux_source_directory(. max_src)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
+
 FIND_PACKAGE( OpenMP REQUIRED)
 
 if(OPENMP_FOUND)

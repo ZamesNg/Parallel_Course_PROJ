@@ -13,6 +13,11 @@
     "iostream": "cpp",
     "filesystem": "cpp",
     "random": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "*.tcc": "cpp",
+    "string": "cpp",
+    "string_view": "cpp",
+    "iterator": "cpp",
+    "vector": "cpp"
   }
 }

@@ -1,36 +1,52 @@
 #include <time.h>
+#include <omp.h>
 
-#include "max.hpp"
-#include "max_cuda.cuh"
+#include "sum.hpp"
+#include "sum_cuda.cuh"
 
 int main(int argc, char **argv)
 {
 
-  float max = -1.0f;
+  float sum = -1.0f;
 
-  time_t begin_t = clock();
-  InitData(rawFloatData, DATANUM);
-  time_t finish_t = clock();
+  double begin_t = omp_get_wtime();
+  InitData();
+  double finish_t = omp_get_wtime();
 
-  printf("init time consumption is %f s \r\n", (double)(finish_t - begin_t) / CLOCKS_PER_SEC);
+  printf("init time consumption is %f s \r\n", finish_t - begin_t);
+  printf("sum should be %f \r\n", (rawFloatData[0] + rawFloatData[DATANUM - 1]) * DATANUM / 2);
 
-  begin_t = clock();
-  max = Max(rawFloatData, DATANUM);
-  finish_t = clock();
+  begin_t = omp_get_wtime();
+  sum = Sum(rawFloatData, DATANUM);
+  finish_t = omp_get_wtime();
 
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM-1]);
-  printf("max() time consumption is %f s \r\n", (double)(finish_t - begin_t) / CLOCKS_PER_SEC);
+  printf("sum number is %f \r\n", sum);
+  printf("Sum() time consumption is %f s \r\n", finish_t - begin_t);
 
-  initialCuda(0);
+  begin_t = omp_get_wtime();
+  sum = SumSpeedUpOmp(rawFloatData, DATANUM);
+  finish_t = omp_get_wtime();
 
-  begin_t = clock();
-  maxWithCuda(&max,rawFloatData,DATANUM);
-  finish_t = clock();
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM-1]);
-  printf("MaxWithCuda() time consumption is %f s \r\n", (double)(finish_t - begin_t) / CLOCKS_PER_SEC);
+  printf("sum number is %f \r\n", sum);
+  // printf("SumSpeedUpOmp() time consumption is %f s \r\n", finish_t - begin_t);
+  printf("SumSpeedUpOmp() time consumption is %f s \r\n", finish_t - begin_t);
 
+  begin_t = omp_get_wtime();
+  sum = SumSpeedUpAvx(rawFloatData, DATANUM);
+  finish_t = omp_get_wtime();
+
+  printf("sum number is %f \r\n", sum);
+  printf("SumSpeedUpAvx() time consumption is %f s \r\n", finish_t - begin_t);
+
+  InitialCuda(0);
+
+  begin_t = omp_get_wtime();
+  SumWithCuda(&sum, rawFloatData, DATANUM);
+  finish_t = omp_get_wtime();
+  printf("sum number is %f \r\n", sum);
+  printf("SumWithCuda() time consumption is %f s \r\n", finish_t - begin_t);
+
+  ReleaseCuda();
 
   return 0;
 }

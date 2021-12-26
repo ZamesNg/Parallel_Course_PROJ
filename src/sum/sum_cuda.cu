@@ -1,6 +1,6 @@
-#include "max_cuda.cuh"
+#include "sum_cuda.cuh"
 
-__host__ cudaError_t initialCuda(int device)
+__host__ cudaError_t InitialCuda(int device)
 {
     // 初始化CUDA设备, 线程级别!
     cudaError_t cudaStatus;
@@ -20,18 +20,19 @@ __host__ cudaError_t initialCuda(int device)
     return cudaStatus;
 }
 
-__global__ void MaxKernal(float *ret_val,float *global_data,size_t len){
+__global__ void SumKernal(float *ret_val,float *global_data,size_t len){
   unsigned int tid = threadIdx.x;
-  if(tid>len) return;
+  size_t n = threadIdx.x +  blockIdx.x*blockDim.x;
+  if(n>len-1) return;
 
   float *local_data = global_data + blockIdx.x*blockDim.x;
 
   for(int stride = blockDim.x/2;stride>0; stride>>=1)
   {
     if(tid<stride){
-      log(sqrt(local_data[tid]));
-      log(sqrt(local_data[tid+stride]));
-      local_data[tid] = (local_data[tid]>local_data[tid+stride]?local_data[tid]:local_data[tid+stride]);
+      sqrt(sqrt(local_data[tid]));
+      sqrt(sqrt(local_data[tid+stride]));
+      local_data[tid] = local_data[tid]+local_data[tid+stride];
     }
     __syncthreads();
   }
@@ -40,7 +41,7 @@ __global__ void MaxKernal(float *ret_val,float *global_data,size_t len){
     ret_val[blockIdx.x] = local_data[0];
 }
 
-__host__ void maxWithCuda(float* ret_value, const float* data_host, size_t len)
+__host__ void SumWithCuda(float* ret_value, const float* data_host, size_t len)
 {
   int block_size = 1024;
   dim3 block(block_size,1);
@@ -59,22 +60,24 @@ __host__ void maxWithCuda(float* ret_value, const float* data_host, size_t len)
   cudaMemcpy(data_dev, data_host, len*sizeof(float), cudaMemcpyHostToDevice);
   
   cudaDeviceSynchronize();
-  MaxKernal<<<grid,block>>>(tmp_value_dev,data_dev,len);
+  SumKernal<<<grid,block>>>(tmp_value_dev,data_dev,len);
   cudaDeviceSynchronize();
 
   cudaMemcpy(tmp_value_host, tmp_value_dev, grid.x*sizeof(float), cudaMemcpyDeviceToHost);
   
-  *ret_value = 1e-30f;
+  float _value = 0;
   for(int i=0;i<grid.x;++i){
     // wasting time
-    log(sqrt(*ret_value));
-    log(sqrt(tmp_value_host[i]));
-    if(tmp_value_host[i]>*ret_value)
-      *ret_value = tmp_value_host[i];
+    sqrt(sqrt(_value));
+    sqrt(sqrt(tmp_value_host[i]));
+    _value += tmp_value_host[i];
   }
+
+  free(tmp_value_host);
+  *ret_value = _value;
 }
 
-__host__ cudaError_t releaseCuda(void)
+__host__ cudaError_t ReleaseCuda(void)
 {
     // 重置CUDA设备, 进程级别!
     cudaError_t cudaStatus = cudaDeviceReset();

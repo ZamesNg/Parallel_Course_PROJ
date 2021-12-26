@@ -1,32 +1,138 @@
 #include <omp.h>
+#include <immintrin.h>
+#include <malloc.h>
 
-#include "max.hpp"
+#include "sum.hpp"
 
-float rawFloatData[DATANUM];
+alignas(32) float rawFloatData[DATANUM];
 
-void InitData(const float data[], const size_t len)
+void InitData()
 {
-// #pragma omp parallel for
-  for (size_t i = 0; i < len; ++i)
+  // #pragma omp parallel for
+  for (size_t i = 0; i < DATANUM; ++i)
   {
-    rawFloatData[i] = float(rand());
-    // rawFloatData[i] = float(i + 1);
+    rawFloatData[i] = float(rand()) * 1e-15f;
+    // rawFloatData[i] = i * 1e-5f;
   }
 }
 
-float Max(const float data[], const int len)
+float Sum(const float data[], const size_t len)
 {
-  float max_num_origin = 1e-30f;
-  float max_num_read = 0.0f;
+  float sum_num_origin = 0.0f;
+  float sum_num_read = 0.0f;
   float cur_num_read = 0.0f;
 
   for (size_t i = 0; i < len; ++i)
   {
-    cur_num_read = log(sqrt(rawFloatData[i]));
-    max_num_read = log(sqrt(max_num_origin));
+    // will be optimize out?
+    cur_num_read = sqrt(sqrt(data[i]));
+    sum_num_read = sqrt(sqrt(sum_num_origin));
+    cur_num_read += sum_num_read;
 
-    if (cur_num_read >= max_num_read)
-      max_num_origin = rawFloatData[i];
+    sum_num_origin += data[i];
   }
-  return max_num_origin;
+  return sum_num_origin;
+}
+
+float SumSpeedUpOmp(const float data[], const size_t len)
+{
+  float sum_num_origin = 0.0f;
+  float sum_num_read = 0.0f;
+  float cur_num_read = 0.0f;
+
+#pragma omp parallel for reduction(+ \
+                                   : sum_num_origin) shared(data) private(cur_num_read, sum_num_read)
+  for (size_t i = 0; i < len; ++i)
+  {
+    cur_num_read = sqrt(sqrt(data[i]));
+    sum_num_read = sqrt(sqrt(sum_num_origin));
+    cur_num_read += sum_num_read;
+
+    sum_num_origin += data[i];
+  }
+  return sum_num_origin;
+}
+
+float SumSpeedUpAvx(const float data[], const size_t len)
+{
+  float sum = 0.0f;
+  size_t num_iters = len / 8;
+  int num_left = len - num_iters * 8;
+
+  printf("iters: %d \t left:%d \r\n", num_iters, num_left);
+  __m256 *ptr = (__m256 *)data;
+  alignas(32) __m256 sum_num_origin = _mm256_set1_ps(0.0f);
+  alignas(32) __m256 sum_num_read = _mm256_set1_ps(0.0f);
+  alignas(32) __m256 cur_num_read = _mm256_set1_ps(0.0f);
+
+  for (size_t i = 0; i < num_iters; ++i, ++ptr)
+  {
+    cur_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(*ptr));
+    sum_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(sum_num_origin));
+
+    sum_num_origin = _mm256_add_ps(sum_num_origin, *ptr);
+  }
+
+  // float *float_ptr = (float *)&sum_num_origin;
+  float *float_ptr;
+  float_ptr = (float *)memalign(32, 8 * sizeof(float));
+  _mm256_store_ps(float_ptr, sum_num_origin);
+
+  for (int i = 0; i < 8; i++)
+  {
+    sqrt(sqrt(sum));
+    sqrt(sqrt(float_ptr[i]));
+    sum += float_ptr[i];
+  }
+
+  for (int i = len - num_left; i < len; ++i)
+  {
+    sqrt(sqrt(sum));
+    sqrt(sqrt(data[i]));
+    sum += data[i];
+  }
+
+  return sum;
+}
+
+float SumSpeedUpAvxOmp(const float data[], const size_t len)
+{
+  float sum = 0.0f;
+  size_t num_iters = len / 8;
+  int num_left = len - num_iters * 8;
+
+  printf("iters: %d \t left:%d \r\n", num_iters, num_left);
+  __m256 *ptr = (__m256 *)data;
+  alignas(32) __m256 sum_num_origin = _mm256_set1_ps(0.0f);
+  alignas(32) __m256 sum_num_read = _mm256_set1_ps(0.0f);
+  alignas(32) __m256 cur_num_read = _mm256_set1_ps(0.0f);
+
+  for (size_t i = 0; i < num_iters; ++i, ++ptr)
+  {
+    cur_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(*ptr));
+    sum_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(sum_num_origin));
+
+    sum_num_origin = _mm256_add_ps(sum_num_origin, *ptr);
+  }
+
+  // float *float_ptr = (float *)&sum_num_origin;
+  float *float_ptr;
+  float_ptr = (float *)memalign(32, 8 * sizeof(float));
+  _mm256_store_ps(float_ptr, sum_num_origin);
+
+  for (int i = 0; i < 8; i++)
+  {
+    sqrt(sqrt(sum));
+    sqrt(sqrt(float_ptr[i]));
+    sum += float_ptr[i];
+  }
+
+  for (int i = len - num_left; i < len; ++i)
+  {
+    sqrt(sqrt(sum));
+    sqrt(sqrt(data[i]));
+    sum += data[i];
+  }
+
+  return sum;
 }

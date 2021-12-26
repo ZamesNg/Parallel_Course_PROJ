@@ -95,6 +95,16 @@ float SumSpeedUpAvx(const float data[], const size_t len)
   return sum;
 }
 
+void _my_mm256_add_ps(__m256 *out, __m256 *in)
+{
+  // store the result of (out + in) to out
+  *out = _mm256_add_ps(*out, *in);
+}
+
+#pragma omp declare reduction(sum_256:__m256                         \
+                              : _my_mm256_add_ps(&omp_out, &omp_in)) \
+    initializer(omp_priv = _mm256_set1_ps(0.0f))
+
 float SumSpeedUpAvxOmp(const float data[], const size_t len)
 {
   float sum = 0.0f;
@@ -107,12 +117,16 @@ float SumSpeedUpAvxOmp(const float data[], const size_t len)
   alignas(32) __m256 sum_num_read = _mm256_set1_ps(0.0f);
   alignas(32) __m256 cur_num_read = _mm256_set1_ps(0.0f);
 
-  for (size_t i = 0; i < num_iters; ++i, ++ptr)
+#pragma omp parallel for reduction(sum_256 \
+                                   : sum_num_origin) shared(ptr) private(cur_num_read, sum_num_read)
+  for (size_t i = 0; i < num_iters; ++i)
   {
     cur_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(*ptr));
     sum_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(sum_num_origin));
 
-    sum_num_origin = _mm256_add_ps(sum_num_origin, *ptr);
+    // sum_num_origin = _mm256_add_ps(sum_num_origin, *ptr);
+    _my_mm256_add_ps(&sum_num_origin, ptr);
+    ++ptr;
   }
 
   // float *float_ptr = (float *)&sum_num_origin;

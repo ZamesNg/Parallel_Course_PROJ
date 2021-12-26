@@ -13,6 +13,7 @@ extern float rawFloatData[DATANUM];
 float Sum(const float data[],const size_t len); 
 float SumSpeedUpOmp(const float data[], const size_t len);
 float SumSpeedUpAvx(const float data[],const size_t len);
+float SumSpeedUpAvxOmp(const float data[],const size_t len);
 
 void InitData();
 

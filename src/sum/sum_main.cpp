@@ -38,6 +38,13 @@ int main(int argc, char **argv)
   printf("sum number is %f \r\n", sum);
   printf("SumSpeedUpAvx() time consumption is %f s \r\n", finish_t - begin_t);
 
+  begin_t = omp_get_wtime();
+  sum = SumSpeedUpAvxOmp(rawFloatData, DATANUM);
+  finish_t = omp_get_wtime();
+
+  printf("sum number is %f \r\n", sum);
+  printf("SumSpeedUpAvxOmp() time consumption is %f s \r\n", finish_t - begin_t);
+
   InitialCuda(0);
 
   begin_t = omp_get_wtime();

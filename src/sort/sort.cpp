@@ -11,7 +11,7 @@ float rawFloatData[DATANUM];
 // declare of invisible function
 void BitonicSortRecursionGeneral(float data[], size_t len, bool dir);
 void BitonicSortRecursionParallel(float data[], size_t len, bool dir);
-void BitonicSort(float data[], const size_t len, bool dir);
+void BitonicSortNonRecursion(float data[], const size_t len, bool dir);
 
 void InitData()
 {
@@ -45,7 +45,7 @@ void Sort(float data[], const size_t len)
 
 void SortSpeedUp(float data[], const size_t len)
 {
-  BitonicSort(data, len, true);
+  BitonicSortNonRecursion(data, len, true);
 }
 
 // https://www.inf.hs-flensburg.de/lang/algorithmen/sortieren/bitonic/oddn.htm
@@ -90,7 +90,7 @@ void BitonicSortRecursionGeneral(float data[], size_t len, bool dir)
   }
 }
 
-void BitonicSortMerge(float data[], size_t len, bool dir)
+void BitonicSortMergeNonRecursion(float data[], size_t len, bool dir)
 {
   // dir = true merge up, false merge down
   size_t step = len / 2;
@@ -113,17 +113,17 @@ void BitonicSortMerge(float data[], size_t len, bool dir)
   }
 }
 
-void BitonicSort(float data[], const size_t len, bool dir)
+void BitonicSortNonRecursion(float data[], const size_t len, bool dir)
 {
-
+  // will need padding
   for (size_t step = 2; step <= len / 2; step *= 2)
   {
     for (size_t i = 0; i < len; i += step * 2)
     {
       // printf("i:%ld \t step: %ld \r\n", i, step);
-      BitonicSortMerge(data + i, step,  !dir);
-      BitonicSortMerge(data + i + step, step, dir);
+      BitonicSortMergeNonRecursion(data + i, step,  !dir);
+      BitonicSortMergeNonRecursion(data + i + step, step, dir);
     }
   }
-  BitonicSortMerge(data, len, dir);
+  BitonicSortMergeNonRecursion(data, len, dir);
 }

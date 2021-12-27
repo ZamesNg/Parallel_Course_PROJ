@@ -5,7 +5,7 @@
 #include <math.h>
 
 #define MAX_THREADS 64
-#define SUBDATANUM 2000000
+#define SUBDATANUM  2000000
 #define DATANUM (SUBDATANUM * MAX_THREADS) /*这个数值是总数据量*/
 
 extern float rawFloatData[DATANUM];

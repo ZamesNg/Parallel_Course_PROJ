@@ -1,5 +1,3 @@
-#include <time.h>
-
 #include <omp.h>
 #include "max.hpp"
 #include "max_cuda.cuh"

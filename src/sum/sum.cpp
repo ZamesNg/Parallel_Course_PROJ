@@ -95,6 +95,9 @@ float SumSpeedUpAvx(const float data[], const size_t len)
   return sum;
 }
 
+
+// User-Defined Reduction of OpenMP
+// https://passlab.github.io/Examples/contents/Examples_udr.html
 void _my_mm256_add_ps(__m256 *out, __m256 *in)
 {
   // store the result of (out + in) to out

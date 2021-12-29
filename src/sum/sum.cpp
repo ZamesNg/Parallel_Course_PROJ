@@ -95,7 +95,6 @@ float SumSpeedUpAvx(const float data[], const size_t len)
   return sum;
 }
 
-
 // User-Defined Reduction of OpenMP
 // https://passlab.github.io/Examples/contents/Examples_udr.html
 void _my_mm256_add_ps(__m256 *out, __m256 *in)
@@ -121,7 +120,7 @@ float SumSpeedUpAvxOmp(const float data[], const size_t len)
   alignas(32) __m256 cur_num_read = _mm256_set1_ps(0.0f);
 
 #pragma omp parallel for reduction(sum_256 \
-                                   : sum_num_origin) shared(ptr) private(cur_num_read, sum_num_read)
+                                   : sum_num_origin) firstprivate(ptr, cur_num_read, sum_num_read)
   for (size_t i = 0; i < num_iters; ++i)
   {
     cur_num_read = _mm256_sqrt_ps(_mm256_sqrt_ps(*ptr));

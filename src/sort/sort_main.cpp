@@ -17,14 +17,14 @@ int main(int argc, char **argv)
 
   printf("init time consumption is %f s \r\n", finish_t - begin_t);
 
-  begin_t = omp_get_wtime();
-  Sort(rawFloatData, DATANUM);
-  finish_t = omp_get_wtime();
+  // begin_t = omp_get_wtime();
+  // Sort(rawFloatData, DATANUM);
+  // finish_t = omp_get_wtime();
 
-  result = CheckSortResult(rawFloatData, DATANUM, true);
-  printf("------------------------\r\n");
-  printf("check result: %d\r\n", result);
-  printf("Sort() time consumption is %f s \r\n", finish_t - begin_t);
+  // result = CheckSortResult(rawFloatData, DATANUM, true);
+  // printf("------------------------\r\n");
+  // printf("check result: %d\r\n", result);
+  // printf("Sort() time consumption is %f s \r\n", finish_t - begin_t);
 
   InitialCuda(0);
 

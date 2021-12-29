@@ -22,6 +22,16 @@ CommManager::CommManager(CommType type, const char *ip, uint16_t port) : comm_ty
   sem_init(&recv_finish_semaphore, 0, 0);
   sem_init(&init_finish_semaphore, 0, 0);
 
+  switch (comm_type)
+  {
+  case CLIENT:
+    InitClient();
+    break;
+  case SERVER:
+    InitServer();
+    break;
+  }
+
   pthread_create(&recv_id, NULL, RecvThread, (void *)this);
   pthread_create(&send_id, NULL, SendThread, (void *)this);
 }
@@ -29,7 +39,6 @@ CommManager::CommManager(CommType type, const char *ip, uint16_t port) : comm_ty
 CommManager::~CommManager()
 {
   delete recv_data_buffer;
-  
 }
 
 void CommManager::InitServer()
@@ -46,15 +55,33 @@ void CommManager::InitServer()
   int c = sizeof(struct sockaddr_in);
   remote_socket_fd = accept(socket_fd, (struct sockaddr *)&remote_addr, (socklen_t *)&c);
 
+  cout << "accept..." << endl;
+
+  int bytes_cnt, data_tmp = 123;
+  bytes_cnt = send(remote_socket_fd, &data_tmp, sizeof(int), 0);
+  bytes_cnt = recv(remote_socket_fd, &data_tmp, sizeof(int), 0);
+  bytes_cnt = send(remote_socket_fd, &data_tmp, sizeof(int), 0);
+
   sem_post(&send_finish_semaphore);
 }
 
 void CommManager::InitClient()
 {
   if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+  {
     cout << "client connect " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " fail: " << strerror(errno) << endl;
+    return;
+  }
   else
+  {
     cout << "client connect " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " success!" << endl;
+  }
+
+  int bytes_cnt, data_tmp = 123;
+  bytes_cnt = recv(socket_fd, &data_tmp, sizeof(int), 0);
+  bytes_cnt = send(socket_fd, &data_tmp, sizeof(int), 0);
+  bytes_cnt = recv(socket_fd, &data_tmp, sizeof(int), 0);
+
   sem_post(&send_finish_semaphore);
 }
 
@@ -124,12 +151,12 @@ void *CommManager::SendThread(void *comm_manager)
   {
   case CLIENT:
     /* code */
-    ptr->InitClient();
+    // ptr->InitClient();
     socket_fd = ptr->socket_fd;
     break;
   case SERVER:
     /* code */
-    ptr->InitServer();
+    // ptr->InitServer();
     socket_fd = ptr->remote_socket_fd;
     break;
   }
@@ -179,7 +206,7 @@ int CommManager::GetInt()
   // blocking to wait recv finish
   sem_wait(&recv_finish_semaphore);
   if (recv_data_type == COMMAND_INT)
-    return *(int*)recv_data_buffer;
+    return *(int *)recv_data_buffer;
   else
   {
     cout << "error type" << endl;
@@ -192,7 +219,7 @@ float CommManager::GetFLoat()
   // blocking to wait recv finish
   sem_wait(&recv_finish_semaphore);
   if (recv_data_type == COMMAND_FLOAT)
-    return *(float*)recv_data_buffer;
+    return *(float *)recv_data_buffer;
   else
   {
     cout << "error type" << endl;

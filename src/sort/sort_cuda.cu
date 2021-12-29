@@ -56,7 +56,7 @@ __global__ void BitonicSortKernal(float* data, size_t step, size_t len,
     }
   }
 
-  __syncthreads();
+  // __syncthreads();
 }
 
 __global__ void BitonicMergeKernal(float* data, size_t step, size_t len,
@@ -73,7 +73,7 @@ __global__ void BitonicMergeKernal(float* data, size_t step, size_t len,
       data[tid + step] = tmp;
     }
   }
-  __syncthreads();
+  // __syncthreads();
 }
 
 __global__ void InitKernal(float* ptr, size_t len, bool dir) {

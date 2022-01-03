@@ -2,7 +2,6 @@
 #include <omp.h>
 
 #include "sum.hpp"
-#include "sum_cuda.cuh"
 
 int main(int argc, char **argv)
 {

@@ -4,16 +4,12 @@
 #include <stdio.h>
 #include <math.h>
 
-#define MAX_THREADS 64
-#define SUBDATANUM 2000000
-#define DATANUM (SUBDATANUM * MAX_THREADS) /*这个数值是总数据量*/
+#include "max_cuda.cuh"
+#include "utils/common.hpp"
 
-extern float rawFloatData[DATANUM];
-
-float Max(const float data[], const size_t len);
-float MaxSpeedUp(const float data[], const size_t len);
-
-
-void InitData();
+float Max(const float data[],const size_t len); 
+float MaxSpeedUpOmp(const float data[], const size_t len);
+float MaxSpeedUpAvx(const float data[],const size_t len);
+float MaxSpeedUpAvxOmp(const float data[],const size_t len);
 
 #endif

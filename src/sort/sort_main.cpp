@@ -2,7 +2,6 @@
 #include <omp.h>
 
 #include "sort.hpp"
-#include "sort_cuda.cuh"
 
 using namespace std;
 

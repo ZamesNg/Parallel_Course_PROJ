@@ -1,4 +1,8 @@
-project(SORT)
+project(sort)
+
+# aux_source_directory(. max_src)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
 
 FIND_PACKAGE( OpenMP REQUIRED)
 
@@ -24,16 +28,20 @@ file(GLOB CUDA_SRC
   ./*.cuh
 )
 cuda_add_library(${PROJECT_NAME}_CUDA SHARED ${CUDA_SRC})
+target_link_libraries(${PROJECT_NAME}_CUDA common_CUDA)
 
 file(GLOB CXX_SRC
-  ./*.c
-  ./*.h
-  ./*.cpp
-  ./*.hpp
+  ${PROJECT_NAME}.cpp
+  ${PROJECT_NAME}.hpp
 )
 
+add_library(${PROJECT_NAME}_LIB STATIC ${CXX_SRC})
+
 include_directories(${CMAKE_SOURCE_DIR}/src)
-add_executable(${PROJECT_NAME} ${CXX_SRC})
+add_executable(${PROJECT_NAME} ${PROJECT_NAME}_main.cpp)
 
 # link the max with cuda lib
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_CUDA)
+target_link_libraries(${PROJECT_NAME} 
+  ${PROJECT_NAME}_CUDA
+  ${PROJECT_NAME}_LIB
+  common_LIB)

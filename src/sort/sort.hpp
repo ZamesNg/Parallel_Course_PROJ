@@ -3,17 +3,13 @@
 
 #include <stdio.h>
 #include <math.h>
-
-#define MAX_THREADS 64
-#define SUBDATANUM  2000000
-#define DATANUM (SUBDATANUM * MAX_THREADS) /*这个数值是总数据量*/
-
-extern float rawFloatData[DATANUM];
+#include "sort_cuda.cuh"
+#include "utils/common.hpp"
 
 void Sort(float data[], const size_t len);
 void SortSpeedUp(float data[], const size_t len);
+void MergeTwoSortedArray(float dataA[],size_t lenA,float dataB[],size_t lenB);
 
-void InitData();
 bool CheckSortResult(float *data, size_t len, bool dir);
 
 #endif

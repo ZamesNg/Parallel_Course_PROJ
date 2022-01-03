@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include <string.h>
+#include <unistd.h>
 
 #define COMMAND_FLOAT ((int)1812)
 #define COMMAND_INT ((int)1824)
@@ -53,14 +54,14 @@ private:
   sem_t recv_finish_semaphore;
 
   int recv_data_type;
-  size_t recv_data_len;
+  int recv_data_len;
   // small buffer to recv data like command or len
   char *recv_data_buffer;
   // big buffer out size the class to recv array
   char *recv_data_ptr;
 
   int send_data_type;
-  size_t send_data_len;
+  int send_data_len;
   char *send_data_ptr;
 
   pthread_t recv_id;

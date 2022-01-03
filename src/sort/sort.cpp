@@ -6,22 +6,10 @@
 
 using namespace std;
 
-float rawFloatData[DATANUM];
-
 // declare of invisible function
 void BitonicSortRecursionGeneral(float data[], size_t len, bool dir);
 void BitonicSortRecursionParallel(float data[], size_t len, bool dir);
 void BitonicSortNonRecursion(float data[], const size_t len, bool dir);
-
-void InitData()
-{
-  // #pragma omp parallel for
-  for (size_t i = 0; i < DATANUM; ++i)
-  {
-    rawFloatData[i] = float(rand());
-    // rawFloatData[i] = float(int(i))*1e0f;
-  }
-}
 
 bool CheckSortResult(float *data, size_t len, bool dir)
 {
@@ -31,7 +19,7 @@ bool CheckSortResult(float *data, size_t len, bool dir)
     tmp = data[i] - data[i - 1];
     if (((tmp > 0.0f) ^ dir) && tmp)
     {
-      cout << "find error at: " << i << " tmp: " << tmp << endl;
+      wcout << "find error at: " << i << " tmp: " << tmp << endl;
       return false;
     }
   }
@@ -121,9 +109,38 @@ void BitonicSortNonRecursion(float data[], const size_t len, bool dir)
     for (size_t i = 0; i < len; i += step * 2)
     {
       // printf("i:%ld \t step: %ld \r\n", i, step);
-      BitonicSortMergeNonRecursion(data + i, step,  !dir);
+      BitonicSortMergeNonRecursion(data + i, step, !dir);
       BitonicSortMergeNonRecursion(data + i + step, step, dir);
     }
   }
   BitonicSortMergeNonRecursion(data, len, dir);
+}
+
+void MergeTwoSortedArray(float dataA[], size_t lenA, float dataB[], size_t lenB)
+{
+  int idx = lenA + lenB - 1;
+  int idxA = lenA - 1;
+  int idxB = lenB - 1;
+
+  while (idx >= 0 && idxA >= 0 && idxB >= 0)
+  {
+    if (dataA[idxA] >= dataB[idxB])
+    {
+      dataA[idx] = dataA[idxA];
+      idxA--;
+    }
+    else
+    {
+      dataA[idx] = dataB[idxB];
+      idxB--;
+    }
+    idx--;
+  }
+  while (idxB >= 0)
+  {
+    dataA[idx] = dataB[idxB];
+    idxB--;
+    idx--;
+  }
+  wcout << "idx:" << idx << "\t idxA:" << idxA << "\t idxB:" << idxB << endl;
 }

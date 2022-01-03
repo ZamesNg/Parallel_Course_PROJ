@@ -4,18 +4,6 @@
 
 #include "sum.hpp"
 
-alignas(32) float rawFloatData[DATANUM];
-
-void InitData()
-{
-  // #pragma omp parallel for
-  for (size_t i = 0; i < DATANUM; ++i)
-  {
-    rawFloatData[i] = float(rand()) * 1e-15f;
-    // rawFloatData[i] = i * 1e-5f;
-  }
-}
-
 float Sum(const float data[], const size_t len)
 {
   float sum_num_origin = 0.0f;
@@ -59,7 +47,7 @@ float SumSpeedUpAvx(const float data[], const size_t len)
   size_t num_iters = len / 8;
   int num_left = len - num_iters * 8;
 
-  printf("iters: %d \t left:%d \r\n", num_iters, num_left);
+  printf("iters: %ld \t left:%d \r\n", num_iters, num_left);
   __m256 *ptr = (__m256 *)data;
   alignas(32) __m256 sum_num_origin = _mm256_set1_ps(0.0f);
   alignas(32) __m256 sum_num_read = _mm256_set1_ps(0.0f);
@@ -113,7 +101,7 @@ float SumSpeedUpAvxOmp(const float data[], const size_t len)
   size_t num_iters = len / 8;
   int num_left = len - num_iters * 8;
 
-  printf("iters: %d \t left:%d \r\n", num_iters, num_left);
+  printf("iters: %ld \t left:%d \r\n", num_iters, num_left);
   __m256 *ptr = (__m256 *)data;
   alignas(32) __m256 sum_num_origin = _mm256_set1_ps(0.0f);
   alignas(32) __m256 sum_num_read = _mm256_set1_ps(0.0f);

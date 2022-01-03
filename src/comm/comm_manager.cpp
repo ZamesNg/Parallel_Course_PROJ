@@ -11,7 +11,7 @@ CommManager::CommManager(CommType type, const char *ip, uint16_t port) : comm_ty
 
   socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_fd == -1)
-    cout << "create socket fail: " << strerror(errno) << endl;
+    wcout << "create socket fail: " << strerror(errno) << endl;
 
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
@@ -39,23 +39,27 @@ CommManager::CommManager(CommType type, const char *ip, uint16_t port) : comm_ty
 CommManager::~CommManager()
 {
   delete recv_data_buffer;
+  close(socket_fd);
+  pthread_cancel(recv_id);
+  pthread_cancel(send_id);
+  wcout << "terminate connection! \n";
 }
 
 void CommManager::InitServer()
 {
 
   if (bind(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-    cout << "server bind " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " fail: " << strerror(errno) << endl;
+    wcout << "server bind " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " fail: " << strerror(errno) << endl;
   else
-    cout << "server bind " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " success!" << endl;
+    wcout << "server bind " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " success!" << endl;
 
   listen(socket_fd, 30);
-  cout << "listening..." << endl;
+  wcout << "listening..." << endl;
 
   int c = sizeof(struct sockaddr_in);
   remote_socket_fd = accept(socket_fd, (struct sockaddr *)&remote_addr, (socklen_t *)&c);
 
-  cout << "accept..." << endl;
+  wcout << "accept..." << endl;
 
   int bytes_cnt, data_tmp = 123;
   bytes_cnt = send(remote_socket_fd, &data_tmp, sizeof(int), 0);
@@ -69,12 +73,12 @@ void CommManager::InitClient()
 {
   if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
   {
-    cout << "client connect " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " fail: " << strerror(errno) << endl;
+    wcout << "client connect " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " fail: " << strerror(errno) << endl;
     return;
   }
   else
   {
-    cout << "client connect " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " success!" << endl;
+    wcout << "client connect " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << " success!" << endl;
   }
 
   int bytes_cnt, data_tmp = 123;
@@ -110,11 +114,11 @@ void *CommManager::RecvThread(void *comm_manager)
     // blocking to recv data type
     recv_bytes_cnt = recv(socket_fd, &ptr->recv_data_type, sizeof(int), 0);
     if (recv_bytes_cnt != sizeof(int))
-      cout << "recv data type fail: " << strerror(errno) << endl;
+      wcout << "recv data type fail: " << strerror(errno) << endl;
     // recv data len
-    recv_bytes_cnt = recv(socket_fd, &ptr->recv_data_len, sizeof(size_t), 0);
-    if (recv_bytes_cnt != sizeof(size_t))
-      cout << "recv data len fail: " << strerror(errno) << endl;
+    recv_bytes_cnt = recv(socket_fd, &ptr->recv_data_len, sizeof(int), 0);
+    if (recv_bytes_cnt != sizeof(int))
+      wcout << "recv data len fail: " << strerror(errno) << endl;
 
     char *data_ptr = nullptr;
     if (ptr->recv_data_len <= RECV_BUFFER_SIZE)
@@ -134,7 +138,7 @@ void *CommManager::RecvThread(void *comm_manager)
     }
     else
     {
-      cout << "recv data ptr not set!" << endl;
+      wcout << "recv data ptr not set!" << endl;
       continue;
     }
     // todo: check if will get too much data
@@ -170,21 +174,21 @@ void *CommManager::SendThread(void *comm_manager)
 
     send_bytes_cnt = send(socket_fd, &ptr->send_data_type, sizeof(int), 0);
     if (send_bytes_cnt != sizeof(int))
-      cout << "send data type fail: " << strerror(errno) << endl;
+      wcout << "send data type fail: " << strerror(errno) << endl;
 
-    send_bytes_cnt = send(socket_fd, &ptr->send_data_len, sizeof(size_t), 0);
-    if (send_bytes_cnt != sizeof(size_t))
-      cout << "send data len fail: " << strerror(errno) << endl;
+    send_bytes_cnt = send(socket_fd, &ptr->send_data_len, sizeof(int), 0);
+    if (send_bytes_cnt != sizeof(int))
+      wcout << "send data len fail: " << strerror(errno) << endl;
 
     size_t cnt = 0;
     char *data_ptr = ptr->send_data_ptr;
     if (ptr->send_data_ptr)
     {
-      while (cnt < ptr->send_data_len)
-      {
-        send_bytes_cnt = send(socket_fd, data_ptr + cnt, ptr->send_data_len - cnt, 0);
-        cnt += send_bytes_cnt;
-      }
+      // while (cnt < ptr->send_data_len)
+      // {
+      send_bytes_cnt = send(socket_fd, data_ptr + cnt, ptr->send_data_len - cnt, 0);
+      // cnt += send_bytes_cnt;
+      // }
     }
     sem_post(&ptr->send_finish_semaphore);
   }
@@ -209,7 +213,7 @@ int CommManager::GetInt()
     return *(int *)recv_data_buffer;
   else
   {
-    cout << "error type" << endl;
+    wcout << "error type" << endl;
     return -1;
   }
 }
@@ -222,7 +226,7 @@ float CommManager::GetFLoat()
     return *(float *)recv_data_buffer;
   else
   {
-    cout << "error type" << endl;
+    wcout << "error type" << endl;
     return -1.0f;
   }
 }

@@ -1,7 +1,7 @@
 #include "comm_manager.hpp"
 
 #define MAX_THREADS 64
-#define SUBDATANUM 2000000
+#define SUBDATANUM 1000000
 #define DATANUM (SUBDATANUM * MAX_THREADS)
 
 float *raw_data_send;
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   }
   if (cnt)
   {
-    printf("get:%d \r\n", cnt);
+    printf("get:%ld \r\n", cnt);
     for (int i = 0; i < 3; i++)
       printf("%f \t %f \t %f \t %f\r\n", raw_data_send[4 * i], raw_data_send[4 * i + 1], raw_data_send[4 * i + 2], raw_data_send[4 * i + 3]);
   }else{

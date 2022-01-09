@@ -13,54 +13,63 @@ int main(int argc, char **argv)
 
   printf("init time consumption is %f s \r\n", finish_t - begin_t);
 
-  begin_t = omp_get_wtime();
-  max = Max(rawFloatData, DATANUM);
-  finish_t = omp_get_wtime();
+  printf("------------------------\r\n");
+  for (int i; i < 5; i++)
+  {
+    begin_t = omp_get_wtime();
+    max = Max(rawFloatData, DATANUM);
+    finish_t = omp_get_wtime();
+
+    printf("iter:%d. max number is %.2f. ", i, max);
+    printf("Max() time consumption is %f s \r\n", finish_t - begin_t);
+  }
 
   printf("------------------------\r\n");
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
-  printf("Max() time consumption is %f s \r\n", finish_t - begin_t);
+  for (int i; i < 5; i++)
+  {
+    begin_t = omp_get_wtime();
+    max = MaxSpeedUpOmp(rawFloatData, DATANUM);
+    finish_t = omp_get_wtime();
 
-  begin_t = omp_get_wtime();
-  max = MaxSpeedUpOmp(rawFloatData, DATANUM);
-  finish_t = omp_get_wtime();
-
-  printf("------------------------\r\n");
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
-  printf("MaxSpeedUpOmp() time consumption is %f s \r\n", finish_t - begin_t);
-
-  begin_t = omp_get_wtime();
-  max = MaxSpeedUpAvx(rawFloatData, DATANUM);
-  finish_t = omp_get_wtime();
+    printf("iter:%d. max number is %.2f. ", i, max);
+    printf("MaxSpeedUpOmp() time consumption is %f s \r\n", finish_t - begin_t);
+  }
 
   printf("------------------------\r\n");
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
-  printf("MaxSpeedUpAvx() time consumption is %f s \r\n", finish_t - begin_t);
+  for (int i; i < 5; i++)
+  {
+    begin_t = omp_get_wtime();
+    max = MaxSpeedUpAvx(rawFloatData, DATANUM);
+    finish_t = omp_get_wtime();
 
-  begin_t = omp_get_wtime();
-  max = MaxSpeedUpAvxOmp(rawFloatData, DATANUM);
-  finish_t = omp_get_wtime();
-
-  printf("------------------------\r\n");
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
-  printf("MaxSpeedUpAvxOmp() time consumption is %f s \r\n", finish_t - begin_t);
-
-  InitialCuda(0);
-
-  begin_t = omp_get_wtime();
-  MaxWithCuda(&max, rawFloatData, DATANUM);
-  finish_t = omp_get_wtime();
-
-  ReleaseCuda();
+    printf("iter:%d. max number is %.2f. ", i, max);
+    printf("MaxSpeedUpAvx() time consumption is %f s \r\n", finish_t - begin_t);
+  }
 
   printf("------------------------\r\n");
-  printf("max number is %.2f \r\n", max);
-  printf("last number is %.2f \r\n", rawFloatData[DATANUM - 1]);
-  printf("MaxWithCuda() time consumption is %f s \r\n", finish_t - begin_t);
+  for (int i; i < 5; i++)
+  {
+    begin_t = omp_get_wtime();
+    max = MaxSpeedUpAvxOmp(rawFloatData, DATANUM);
+    finish_t = omp_get_wtime();
 
+    printf("iter:%d. max number is %.2f. ", i, max);
+    printf("MaxSpeedUpAvxOmp() time consumption is %f s \r\n", finish_t - begin_t);
+  }
+
+  
+  printf("------------------------\r\n");
+  for (int i; i < 5; i++)
+  {
+    InitialCuda(0);
+    begin_t = omp_get_wtime();
+    MaxWithCuda(&max, rawFloatData, DATANUM);
+    finish_t = omp_get_wtime();
+
+    printf("iter:%d. max number is %.2f. ", i, max);
+    printf("MaxWithCuda() time consumption is %f s \r\n", finish_t - begin_t);
+    ReleaseCuda();
+  }
+  
   return 0;
 }

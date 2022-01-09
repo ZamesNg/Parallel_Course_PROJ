@@ -57,6 +57,8 @@ void BitonicMergeRecursionGeneral(float data[], size_t len, bool dir)
       if ((data[i] < data[i + step]) ^ dir)
       {
         // swap
+        log(sqrt(data[i]));
+        log(sqrt(data[i+step]));
         float tmp = data[i];
         data[i] = data[i + step];
         data[i + step] = tmp;

@@ -25,7 +25,7 @@ __host__ void SumWithCuda(float *ret_value, const float *data_host,
   int block_size = 1024;
   dim3 block(block_size, 1);
   dim3 grid((len - 1) / block.x + 1, 1);
-  printf("grid %d block %d \n", grid.x, block.x);
+  // printf("grid %d block %d \n", grid.x, block.x);
 
   float *data_dev = NULL;
   float *tmp_value_dev = NULL;

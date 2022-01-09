@@ -10,6 +10,8 @@ __global__ void BitonicSortKernal(float* data, size_t step, size_t len,
   size_t i = tid % step;
   if (i < step / 2) {
     if ((data[tid] < data[tid + step - 2 * i - 1]) ^ dir) {
+      log(sqrt(data[tid]));
+      log(sqrt(data[tid + step - 2 * i - 1]));
       tmp = data[tid];
       data[tid] = data[tid + step - 2 * i - 1];
       data[tid + step - 2 * i - 1] = tmp;
@@ -28,6 +30,9 @@ __global__ void BitonicMergeKernal(float* data, size_t step, size_t len,
   size_t i = tid % (2 * step);
   if (i < step) {
     if ((data[tid] < data[tid + step]) ^ dir) {
+      log(sqrt(data[tid]));
+      log(sqrt(data[tid + step]));
+
       tmp = data[tid];
       data[tid] = data[tid + step];
       data[tid + step] = tmp;

@@ -6,7 +6,7 @@
 
 
 #define MAX_THREADS 64
-#define SUBDATANUM 10000
+#define SUBDATANUM 2000000
 #define DATANUM (SUBDATANUM * MAX_THREADS)
 
 extern float rawFloatData[DATANUM];

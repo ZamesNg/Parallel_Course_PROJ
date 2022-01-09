@@ -1,5 +1,6 @@
 #include <iostream>
 #include <omp.h>
+#include <string.h>
 
 #include "sort.hpp"
 
@@ -16,26 +17,34 @@ int main(int argc, char **argv)
 
   printf("init time consumption is %f s \r\n", finish_t - begin_t);
 
-  // begin_t = omp_get_wtime();
-  // Sort(rawFloatData, DATANUM);
-  // finish_t = omp_get_wtime();
-
-  // result = CheckSortResult(rawFloatData, DATANUM, true);
-  // printf("------------------------\r\n");
-  // printf("check result: %d\r\n", result);
-  // printf("Sort() time consumption is %f s \r\n", finish_t - begin_t);
-
-  InitialCuda(0);
-
-  begin_t = omp_get_wtime();
-  SortWithCuda(rawFloatData, DATANUM, true);
-  finish_t = omp_get_wtime();
-
-  result = CheckSortResult(rawFloatData, DATANUM, true);
+  float *tmp = new float[DATANUM];
   printf("------------------------\r\n");
-  printf("check result: %d\r\n", result);
-  printf("SortWithCuda() time consumption is %f s \r\n", finish_t - begin_t);
+  for (int i; i < 5; i++)
+  {
+    memcpy(tmp, rawFloatData, DATANUM * sizeof(float));
+    begin_t = omp_get_wtime();
+    Sort(tmp, DATANUM);
+    finish_t = omp_get_wtime();
 
-  ReleaseCuda();
+    result = CheckSortResult(tmp, DATANUM, true);
+    printf("iter:%d. check result: %d. ", i, result);
+    printf("Sort() time consumption is %f s \r\n", finish_t - begin_t);
+  }
+
+  printf("------------------------\r\n");
+  for (int i; i < 5; i++)
+  {
+    memcpy(tmp, rawFloatData, DATANUM * sizeof(float));
+    InitialCuda(0);
+    begin_t = omp_get_wtime();
+    SortWithCuda(tmp, DATANUM, true);
+    finish_t = omp_get_wtime();
+
+    result = CheckSortResult(tmp, DATANUM, true);
+    printf("iter:%d. check result: %d. ", i, result);
+    printf("SortWithCuda() time consumption is %f s \r\n", finish_t - begin_t);
+    ReleaseCuda();
+  }
+
   return 0;
 }

@@ -5,6 +5,7 @@ add_subdirectory(max)
 add_subdirectory(comm)
 add_subdirectory(sum)
 add_subdirectory(sort)
+add_subdirectory(class_hw)
 
 project(main)
 

@@ -14,5 +14,4 @@ add_executable(${PROJECT_NAME} ${PROJECT_NAME}_main.cpp)
 
 # link the max with cuda lib
 target_link_libraries(${PROJECT_NAME} 
-  ${PROJECT_NAME}_LIB
-  common_LIB)
+  ${PROJECT_NAME}_LIB)
